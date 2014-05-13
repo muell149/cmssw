@@ -20,7 +20,7 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "RecoJets/JetAlgorithms/interface/CompoundPseudoJet.h"
 #include "RecoJets/JetAlgorithms/interface/SubjetFilterAlgorithm.h"
-
+#include "RecoJets/JetAlgorithms/interface/NSubjettinessAlgorithm.h"
 
 class SubjetFilterJetProducer : public VirtualJetProducer
 {
@@ -49,8 +49,21 @@ public:
   // member data
   //
 private:
-  SubjetFilterAlgorithm           alg_;
-  std::vector<CompoundPseudoJet>  fjCompoundJets_;
+
+  std::string              		FatjetAlgorithm_;
+  double                   		rParam_;
+  bool                     		doAreaFastjet_;
+  double                   		ghostEtaMax_;
+  int                      		activeAreaRepeats_;
+  double                   		ghostArea_;
+  
+  fastjet::JetDefinition*			fjJetDef_;
+  fastjet::AreaDefinition*			fjAreaDef_;
+  
+  SubjetFilterAlgorithm				alg_;
+  NSubjettinessAlgorithm			nSubJet_;
+  
+  std::vector<CompoundPseudoJet>	fjCompoundJets_;
 };
 
 
