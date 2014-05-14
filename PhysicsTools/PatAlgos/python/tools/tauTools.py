@@ -173,10 +173,10 @@ def _switchToPFTau(process,
                      ("byTightIsolationMVA2", "DiscriminationByTightIsolationMVA2"),
                      ("againstElectronMVA2raw", "DiscriminationByMVA2rawElectronRejection"),
                      ("againstElectronMVA2category", "DiscriminationByMVA2rawElectronRejection:category"),
-                     ("againstElectronVLooseMVA2", "DiscriminationByMVA2VLooseElectronRejection"),
+                     ("againstElectronVLooseMVA2", "DiscriminationByMVA2VLooseElectronRejection"),#
                      ("againstElectronLooseMVA2", "DiscriminationByMVA2LooseElectronRejection"),
                      ("againstElectronMediumMVA2", "DiscriminationByMVA2MediumElectronRejection"),
-                     ("againstElectronTightMVA2", "DiscriminationByMVA2TightElectronRejection"),
+                     ("againstElectronTightMVA2", "DiscriminationByMVA2TightElectronRejection"),#
                      ("byLooseCombinedIsolationDeltaBetaCorr3Hits", "DiscriminationByLooseCombinedIsolationDBSumPtCorr3Hits"),
                      ("byMediumCombinedIsolationDeltaBetaCorr3Hits", "DiscriminationByMediumCombinedIsolationDBSumPtCorr3Hits"),
                      ("byTightCombinedIsolationDeltaBetaCorr3Hits", "DiscriminationByTightCombinedIsolationDBSumPtCorr3Hits"),
@@ -190,9 +190,9 @@ def _switchToPFTau(process,
                      ("againstElectronDeadECAL", "DiscriminationByDeadECALElectronRejection"),
                      ("againstMuonLoose2", "DiscriminationByLooseMuonRejection2"),
                      ("againstMuonMedium2", "DiscriminationByMediumMuonRejection2"),
-                     ("againstMuonTight2", "DiscriminationByTightMuonRejection2")
-                     #("againstMuonLoose3", "DiscriminationByLooseMuonRejection3"),
-                     #("againstMuonTight3", "DiscriminationByTightMuonRejection3")
+                     ("againstMuonTight2", "DiscriminationByTightMuonRejection2"),
+#                     ("againstMuonLoose3", "DiscriminationByLooseMuonRejection3"),
+#                     ("againstMuonTight3", "DiscriminationByTightMuonRejection3")
                      ]
     
     applyPostfix(process, "patTaus" + patTauLabel, postfix).tauSource = pfTauLabelNew
