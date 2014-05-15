@@ -33,13 +33,12 @@ class SubjetFilterAlgorithm
   //
 public:
   SubjetFilterAlgorithm(const std::string& moduleLabel,
-			const std::string& jetAlgorithm,
-			unsigned nFatMax,      double rParam,
+			double rParam,			  unsigned nFatMax,
+			const std::string& FilterjetAlgorithm,
 			double   rFilt,        double jetPtMin,
 			double   massDropCut,  double asymmCut,
 			bool     asymmCutLater,bool   doAreaFastjet,
-			double   ghostEtaMax,  int    activeAreaRepeats,
-			double   ghostArea,    bool   verbose);
+			bool   verbose);
   virtual ~SubjetFilterAlgorithm();
   
   
@@ -47,9 +46,10 @@ public:
   // member functions
   //
 public:
-  void run(const std::vector<fastjet::PseudoJet>& inputs, 
-	   std::vector<CompoundPseudoJet>& fatJets,
-	   const edm::EventSetup& iSetup);
+  void run(const std::vector<fastjet::PseudoJet> & inputs, 
+	   std::vector<CompoundPseudoJet> & fatJets,
+		boost::shared_ptr<fastjet::ClusterSequence> & fjClusterSeq,
+	   const edm::EventSetup & iSetup);
   
   std::string summary() const;
   
@@ -59,18 +59,15 @@ public:
   //
 private:
   std::string              moduleLabel_;
-  std::string              jetAlgorithm_;
-  unsigned                 nFatMax_;
   double                   rParam_;
+  unsigned                 nFatMax_;
+  std::string              FilterjetAlgorithm_;
   double                   rFilt_;
   double                   jetPtMin_;
   double                   massDropCut_;
   double                   asymmCut2_;
   bool                     asymmCutLater_;
   bool                     doAreaFastjet_;
-  double                   ghostEtaMax_;
-  int                      activeAreaRepeats_;
-  double                   ghostArea_;
   bool                     verbose_;
   
   unsigned                 nevents_;
@@ -78,6 +75,7 @@ private:
   unsigned                 nfound_;
   
   fastjet::JetDefinition*  fjJetDef_;
+  fastjet::JetDefinition*  fjFilterJetDef_;
   fastjet::AreaDefinition* fjAreaDef_;
 
 };
