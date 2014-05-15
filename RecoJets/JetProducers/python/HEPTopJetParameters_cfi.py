@@ -39,5 +39,5 @@ HEPTopJetsGen = cms.EDProducer(
 HEPTopJetsGen.jetPtMin			= cms.double(20.)
 HEPTopJetsGen.doAreaFastjet	= cms.bool(False)
 
-heptopjet_seq = cms.Sequence(HEPTopJetsPF)
-heptopjet_genseq = cms.Sequence(HEPTopJetsGen)
+heptopjet_pf_seq = cms.Sequence(HEPTopJetsPF)
+heptopjet_gen_seq = cms.Sequence(HEPTopJetsGen)
