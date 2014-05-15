@@ -12,15 +12,15 @@ HEPTopJetsPF = cms.EDProducer(
     PFJetParameters,
     AnomalousCellParameters,
     jetAlgorithm 			= cms.string("CambridgeAachen"),
-	 rParam       			= cms.double(1.5),
-	 MassDropThreshold	= cms.double(0.8),
-	 MaxSubjetMass 		= cms.double(30.),
-	 UseSubjetMassCuts	= cms.bool(False),
-	 centralEtaCut			= cms.double(2.5),
-	 nSubjettinessNmin	= cms.int32(1),
-	 nSubjettinessNmax	= cms.int32(4)
+    rParam       			= cms.double(1.5),
+    MassDropThreshold	= cms.double(0.8),
+    MaxSubjetMass 		= cms.double(30.),
+    UseSubjetMassCuts	= cms.bool(False),
+    centralEtaCut			= cms.double(2.5),
+    nSubjettinessNmin	= cms.int32(1),
+    nSubjettinessNmax	= cms.int32(4)
 )
-HEPTopJetsPF.jetPtMin		= cms.double(20.)
+HEPTopJetsPF.jetPtMin		= cms.double(100.)
 HEPTopJetsPF.doAreaFastjet = cms.bool(False)
 
 HEPTopJetsGen = cms.EDProducer(
@@ -28,15 +28,15 @@ HEPTopJetsGen = cms.EDProducer(
     GenJetParameters,
     AnomalousCellParameters,
     jetAlgorithm 			= cms.string("CambridgeAachen"),
-	 rParam       			= cms.double(1.5),
-	 MassDropThreshold	= cms.double(0.8),
-	 MaxSubjetMass 		= cms.double(30.),
-	 UseSubjetMassCuts	= cms.bool(False),
-	 centralEtaCut			= cms.double(2.5),
-	 nSubjettinessNmin	= cms.int32(1),
-	 nSubjettinessNmax	= cms.int32(4)
+    rParam       			= cms.double(1.5),
+    MassDropThreshold	= cms.double(0.8),
+    MaxSubjetMass 		= cms.double(30.),
+    UseSubjetMassCuts	= cms.bool(False),
+    centralEtaCut			= cms.double(2.5),
+    nSubjettinessNmin	= cms.int32(1),
+    nSubjettinessNmax	= cms.int32(4)
 )
-HEPTopJetsGen.jetPtMin			= cms.double(20.)
+HEPTopJetsGen.jetPtMin			= cms.double(100.)
 HEPTopJetsGen.doAreaFastjet	= cms.bool(False)
 
 heptopjet_pf_seq = cms.Sequence(HEPTopJetsPF)
