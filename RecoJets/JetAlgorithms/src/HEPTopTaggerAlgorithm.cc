@@ -105,15 +105,19 @@ void HEPTopTaggerAlgorithm::run(const std::vector<fastjet::PseudoJet>& fjInputs,
 		if (fjFatJetIt->perp() > jetPtMin_ && fabs(fjFatJetIt->pseudorapidity()) < centralEtaCut_) fjCentralFatJets.push_back(*fjFatJetIt);
 	}
 	
+	if(verbose_) cout<<endl<<"NUMBER OF FAT JETS BEFORE SELECTION : "<<fjFatJets.size()<<"\tAFTER SELECTION : "<<fjCentralFatJets.size()<<endl;
+	
 	size_t nFat = (nFatMax_==0) ? fjCentralFatJets.size() : std::min(fjCentralFatJets.size(),(size_t)nFatMax_);
 	
 	vector<fastjet::PseudoJet>::iterator fjCentralFatJetsIt = fjCentralFatJets.begin(), fjCentralFatJetsEnd = fjCentralFatJets.end();
 	
 	for (;fjCentralFatJetsIt!=fjCentralFatJetsEnd;++fjCentralFatJetsIt){
 		
-		if(ntotal_ >= nFat) break;
+		size_t iFat = fjCentralFatJetsIt - fjCentralFatJets.begin();
 		
-		if (verbose_) cout<<endl<<ntotal_<<". FATJET: "<<*fjCentralFatJetsIt<<endl;
+		if(iFat >= nFat) break;
+		
+		if (verbose_) cout<<endl<<iFat<<". FATJET: "<<*fjCentralFatJetsIt<<endl;
 		
 		ntotal_++;
 		
