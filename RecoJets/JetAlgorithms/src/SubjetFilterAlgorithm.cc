@@ -29,39 +29,36 @@
 using namespace std;
 
 
-ostream & operator<<(ostream & ostr, fastjet::PseudoJet & jet);
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // construction / destruction
 ////////////////////////////////////////////////////////////////////////////////
 
 //______________________________________________________________________________
 SubjetFilterAlgorithm::SubjetFilterAlgorithm(const std::string& moduleLabel,
-						  double   rParam,
-						  unsigned nFatMax,
-						  const std::string& FilterjetAlgorithm,
-						  double   rFilt,
-					     double   jetPtMin, 
-					     double   massDropCut,
-					     double   asymmCut,
-					     bool     asymmCutLater,
-					     bool     doAreaFastjet,
-					     bool     verbose)
-  : moduleLabel_(moduleLabel)
-  , rParam_(rParam)
-  , nFatMax_(nFatMax)
-  , FilterjetAlgorithm_(FilterjetAlgorithm)
-  , rFilt_(rFilt)
-  , jetPtMin_(jetPtMin)
-  , massDropCut_(massDropCut)
-  , asymmCut2_(asymmCut*asymmCut)
-  , asymmCutLater_(asymmCutLater)
-  , doAreaFastjet_(doAreaFastjet)
-  , verbose_(verbose)
-  , nevents_(0)
-  , ntotal_(0)
-  , nfound_(0)
+											bool verbose,
+											bool doAreaFastjet,
+											double rParam,
+											unsigned nFatMax,
+											double jetPtMin,
+											double centralEtaCut,
+											double massDropCut,
+											double rFilt,
+											double asymmCut,
+											bool asymmCutLater)
+  : moduleLabel_(moduleLabel),
+    verbose_(verbose),
+	doAreaFastjet_(doAreaFastjet),
+    rParam_(rParam),
+	nFatMax_(nFatMax),
+	jetPtMin_(jetPtMin),
+	centralEtaCut_(centralEtaCut),
+	massDropCut_(massDropCut),
+	rFilt_(rFilt),
+	asymmCut2_(asymmCut*asymmCut),
+	asymmCutLater_(asymmCutLater),
+	nevents_(0),
+	ntotal_(0),
+	nfound_(0)
 {
 
 }
@@ -78,24 +75,49 @@ SubjetFilterAlgorithm::~SubjetFilterAlgorithm()
 // implementation of member functions
 ////////////////////////////////////////////////////////////////////////////////
 
+
+namespace{
+	/// does the actual work for printing out a jet
+	ostream & operator<<(ostream & ostr, fastjet::PseudoJet & jet) {
+	  ostr << "pt="  <<setw(10)<<jet.perp() 
+    	   << " eta="<<setw(6) <<jet.eta()  
+    	   << " m="  <<setw(10)<<jet.m();
+	  return ostr;
+	}
+}
+
+
 //______________________________________________________________________________
 void SubjetFilterAlgorithm::run(const std::vector<fastjet::PseudoJet>& fjInputs, 
 				std::vector<CompoundPseudoJet>& fjJets,
-				boost::shared_ptr<fastjet::ClusterSequence> & cs,
-				const edm::EventSetup& iSetup)
+				boost::shared_ptr<fastjet::ClusterSequence> & cs)
 {
 	nevents_++;
 	if (verbose_) cout<<endl<<nevents_<<". EVENT"<<endl;
 	
 	vector<fastjet::PseudoJet> fjFatJets = fastjet::sorted_by_pt(cs->inclusive_jets(jetPtMin_));
-
-	size_t nFat = (nFatMax_==0) ? fjFatJets.size() : std::min(fjFatJets.size(),(size_t)nFatMax_);
-
-	for (size_t iFat=0;iFat<nFat;iFat++) {
-
-		if (verbose_) cout<<endl<<iFat<<". FATJET: "<<fjFatJets[iFat]<<endl;
-
-		fastjet::PseudoJet fjFatJet = fjFatJets[iFat];
+	
+	vector<fastjet::PseudoJet> fjCentralFatJets;
+	
+	vector<fastjet::PseudoJet>::iterator fjFatJetIt = fjFatJets.begin(), fjFatJetEnd = fjFatJets.end();
+	
+	for (;fjFatJetIt!=fjFatJetEnd; fjFatJetIt++) {
+		if (fjFatJetIt->perp() > jetPtMin_ && fabs(fjFatJetIt->pseudorapidity()) < centralEtaCut_) fjCentralFatJets.push_back(*fjFatJetIt);
+	}
+	
+	size_t nFat = (nFatMax_==0) ? fjCentralFatJets.size() : std::min(fjCentralFatJets.size(),(size_t)nFatMax_);
+	
+	vector<fastjet::PseudoJet>::iterator fjCentralFatJetsIt = fjCentralFatJets.begin(), fjCentralFatJetsEnd = fjCentralFatJets.end();
+	
+	for (;fjCentralFatJetsIt!=fjCentralFatJetsEnd;++fjCentralFatJetsIt){
+		
+		if(ntotal_ >= nFat) break;
+		
+		if (verbose_) cout<<endl<<ntotal_<<". FATJET: "<<*fjCentralFatJetsIt<<endl;
+		
+		ntotal_++;
+		
+		fastjet::PseudoJet fjFatJet = *fjCentralFatJetsIt;
 		fastjet::PseudoJet fjCurrentJet(fjFatJet);
 		fastjet::PseudoJet fjSubJet1,fjSubJet2;
 		bool hadSubJets;
@@ -136,22 +158,6 @@ void SubjetFilterAlgorithm::run(const std::vector<fastjet::PseudoJet>& fjInputs,
 				double       Rbb   = std::sqrt(fjSubJet1.squared_distance(fjSubJet2));
 				double       Rfilt = std::min(0.5*Rbb,rFilt_);
 				double       dcut  = Rfilt*Rfilt/rParam_/rParam_;
-				
-				/*
-				if (FilterjetAlgorithm_=="CambridgeAachen"||FilterjetAlgorithm_=="ca")
-					fjFilterJetDef_= new fastjet::JetDefinition(fastjet::cambridge_algorithm,dcut);
-				else if (FilterjetAlgorithm_=="AntiKt"||FilterjetAlgorithm_=="ak")
-					fjFilterJetDef_= new fastjet::JetDefinition(fastjet::antikt_algorithm,dcut);
-				else if (FilterjetAlgorithm_=="Kt"||FilterjetAlgorithm_=="kt")
-					fjFilterJetDef_= new fastjet::JetDefinition(fastjet::kt_algorithm,dcut);
-				else
-					throw cms::Exception("InvalidJetAlgo") << "Filter Jet Algorithm for SubjetFilterAlgorithm is invalid: "
-					<< FilterjetAlgorithm_<< ", use (ca|CambridgeAachen)|(Kt|kt)|(AntiKt|ak)" << endl;
-				
-				fastjet::ClusterSequence* cs_Filterjet = new fastjet::ClusterSequence(fjCurrentJet.constituents(),*fjFilterJetDef_);
-				
-				fjFilterJets=fastjet::sorted_by_pt(cs_Filterjet->inclusive_jets());
-				*/
 				
 				fjFilterJets=fastjet::sorted_by_pt(cs->exclusive_subjets(fjCurrentJet,dcut));
 				
@@ -196,7 +202,6 @@ void SubjetFilterAlgorithm::run(const std::vector<fastjet::PseudoJet>& fjInputs,
 
 		fjJets.push_back(CompoundPseudoJet(fjFatJet,fatJetArea,subJets));
 
-		ntotal_++;
 		if (subJets.size()>3) nfound_++;
 
 	} // LOOP OVER FATJETS
@@ -223,14 +228,4 @@ string SubjetFilterAlgorithm::summary() const
     <<"eff     = "<<eff<<endl
     <<"************************************************************\n";
   return ss.str();
-}
-
-
-
-/// does the actual work for printing out a jet
-ostream & operator<<(ostream & ostr, fastjet::PseudoJet & jet) {
-  ostr << "pt="  <<setw(10)<<jet.perp() 
-       << " eta="<<setw(6) <<jet.eta()  
-       << " m="  <<setw(10)<<jet.m();
-  return ostr;
 }

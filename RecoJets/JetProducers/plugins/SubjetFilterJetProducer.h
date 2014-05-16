@@ -24,46 +24,32 @@
 
 class SubjetFilterJetProducer : public VirtualJetProducer
 {
-  //
-  // construction / destruction
-  //
-public:
-  SubjetFilterJetProducer(const edm::ParameterSet& ps);
-  virtual ~SubjetFilterJetProducer();
-  
-  
-  //
-  // member functions
-  //
-public:
-  void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
-  void endJob();
-  void runAlgorithm(edm::Event& iEvent, const edm::EventSetup& iSetup);
-  void inputTowers();
-  void output(edm::Event& iEvent,const edm::EventSetup& iSetup);
-  template<class T>
-  void writeCompoundJets(edm::Event& iEvent,const edm::EventSetup& iSetup);
-  
-  
-  //
-  // member data
-  //
-private:
+	//
+	// construction / destruction
+	//
+	public:
+		SubjetFilterJetProducer(const edm::ParameterSet& ps);
+		virtual ~SubjetFilterJetProducer();
 
-  std::string              		FatjetAlgorithm_;
-  double                   		rParam_;
-  bool                     		doAreaFastjet_;
-  double                   		ghostEtaMax_;
-  int                      		activeAreaRepeats_;
-  double                   		ghostArea_;
-  
-  fastjet::JetDefinition*			fjJetDef_;
-  fastjet::AreaDefinition*			fjAreaDef_;
-  
-  SubjetFilterAlgorithm				alg_;
-  NSubjettinessAlgorithm			nSubJet_;
-  
-  std::vector<CompoundPseudoJet>	fjCompoundJets_;
+	//
+	// member functions
+	//
+	public:
+		void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
+		void endJob();
+		void runAlgorithm(edm::Event& iEvent, const edm::EventSetup& iSetup);
+		void inputTowers();
+		void output(edm::Event& iEvent,const edm::EventSetup& iSetup);
+		template<class T>
+		void writeCompoundJets(edm::Event& iEvent,const edm::EventSetup& iSetup);
+
+	//
+	// member data
+	//
+	private:
+		SubjetFilterAlgorithm				alg_;
+		NSubjettinessAlgorithm			nSubJet_;
+		std::vector<CompoundPseudoJet>	fjCompoundJets_;
 };
 
 

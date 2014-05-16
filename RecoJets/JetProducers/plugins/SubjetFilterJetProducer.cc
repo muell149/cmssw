@@ -26,6 +26,7 @@
 
 
 #include "SubjetFilterJetProducer.h"
+
 #include "RecoJets/JetProducers/interface/JetSpecific.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
@@ -40,67 +41,41 @@ using namespace std;
 //______________________________________________________________________________
 SubjetFilterJetProducer::SubjetFilterJetProducer(const edm::ParameterSet& iConfig)
   : VirtualJetProducer(iConfig)
-  , FatjetAlgorithm_(iConfig.getParameter<string>("jetAlgorithm"))
-  , rParam_(iConfig.getParameter<double>("rParam"))
-  , doAreaFastjet_(iConfig.getParameter<bool>("doAreaFastjet"))
-  , ghostEtaMax_(iConfig.getParameter<double>("Ghost_EtaMax"))
-  , activeAreaRepeats_(iConfig.getParameter<int>("Active_Area_Repeats"))
-  , ghostArea_(iConfig.getParameter<double>  ("GhostArea"))
-  , fjJetDef_(0)
-  , fjAreaDef_(0)
-  , alg_(iConfig.getParameter<string>  ("@module_label"),
-		 iConfig.getParameter<double>    ("rParam"),
-		 iConfig.getParameter<unsigned>	("nFatMax"),
-		 iConfig.getParameter<string>    ("filterjetAlgorithm"),
-		 iConfig.getParameter<double>    ("rFilt"),
-		 iConfig.getParameter<double>    ("jetPtMin"),
-		 iConfig.getParameter<double>    ("massDropCut"),
-		 iConfig.getParameter<double>    ("asymmCut"),
-		 iConfig.getParameter<bool>      ("asymmCutLater"),
-		 iConfig.getParameter<bool>      ("doAreaFastjet"),
-		 iConfig.getUntrackedParameter<bool>("verbose",false)
+  , alg_(iConfig.getParameter<string>	("@module_label"),
+  		 iConfig.getParameter<bool> 	("verbose"),
+		 iConfig.getParameter<bool>     ("doAreaFastjet"),
+		 iConfig.getParameter<double>   ("rParam"),
+		 iConfig.getParameter<unsigned> ("nFatMax"),
+		 iConfig.getParameter<double>   ("jetPtMin"),
+		 iConfig.getParameter<double>   ("centralEtaCut"),
+		 iConfig.getParameter<double>   ("massDropCut"),
+		 iConfig.getParameter<double>   ("rFilt"),
+		 iConfig.getParameter<double>   ("asymmCut"),
+		 iConfig.getParameter<bool>     ("asymmCutLater")
 	 ),
 	 nSubJet_(iConfig.getParameter<double>("rParam"),
 			iConfig.getParameter<int>("nSubjettinessNmin"),
 			iConfig.getParameter<int>("nSubjettinessNmax")
 	 )
 {
-  produces<reco::BasicJetCollection>("fatjet");
-  makeProduces(moduleLabel_,"subjets");
-  makeProduces(moduleLabel_,"filterjets");
-  
+	produces<reco::BasicJetCollection>("fatjet");
+	makeProduces(moduleLabel_,"subjets");
+	makeProduces(moduleLabel_,"filterjets");
+
 	for(size_t N=nSubJet_.getNmin();N<=nSubJet_.getNmax();N++){
 		char tau_char[50];
 		sprintf (tau_char, "tau%i", (int) N);
 		std::string tau_string = tau_char;
-		
-  		produces<std::vector<double> >(tau_string);
-	}
-  
-  if (FatjetAlgorithm_=="CambridgeAachen"||FatjetAlgorithm_=="ca")
-    fjJetDef_= new fastjet::JetDefinition(fastjet::cambridge_algorithm,rParam_);
-  else if (FatjetAlgorithm_=="AntiKt"||FatjetAlgorithm_=="ak")
-    fjJetDef_= new fastjet::JetDefinition(fastjet::antikt_algorithm,rParam_);
-  else if (FatjetAlgorithm_=="Kt"||FatjetAlgorithm_=="kt")
-    fjJetDef_= new fastjet::JetDefinition(fastjet::kt_algorithm,rParam_);
-  else
-    throw cms::Exception("InvalidJetAlgo") << "Fat Jet Algorithm for SubjetFilterAlgorithm is invalid: "
-      << FatjetAlgorithm_ << ", use (ca|CambridgeAachen)|(Kt|kt)|(AntiKt|ak)" << endl;
 
-  if (doAreaFastjet_) {
-    fastjet::GhostedAreaSpec ghostSpec(ghostEtaMax_,activeAreaRepeats_,ghostArea_);
-    fjAreaDef_= new fastjet::AreaDefinition(fastjet::active_area_explicit_ghosts,
-					   ghostSpec); 
-  }
-  
+		produces<std::vector<double> >(tau_string);
+	}
 }
 
 
 //______________________________________________________________________________
 SubjetFilterJetProducer::~SubjetFilterJetProducer()
 {
-  if (0!=fjJetDef_)  delete fjJetDef_;
-  if (0!=fjAreaDef_) delete fjAreaDef_;
+
 }
 
 
@@ -127,11 +102,15 @@ void SubjetFilterJetProducer::endJob()
 void SubjetFilterJetProducer::runAlgorithm(edm::Event& iEvent,
 					   const edm::EventSetup& iSetup)
 { 
-  fjClusterSeq_ = (doAreaFastjet_) ?
-	  ClusterSequencePtr( new fastjet::ClusterSequenceArea(fjInputs_,*fjJetDef_,*fjAreaDef_) ) :
-	  ClusterSequencePtr( new fastjet::ClusterSequence    (fjInputs_,*fjJetDef_) );
+  if ( !doAreaFastjet_ && !doRhoFastjet_) {
+    fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequence( fjInputs_, *fjJetDefinition_ ) );
+  } else if (voronoiRfact_ <= 0) {
+    fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequenceArea( fjInputs_, *fjJetDefinition_ , *fjAreaDefinition_ ) );
+  } else {
+    fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequenceVoronoiArea( fjInputs_, *fjJetDefinition_ , fastjet::VoronoiAreaSpec(voronoiRfact_) ) );
+  }
   
-  alg_.run(fjInputs_, fjCompoundJets_, fjClusterSeq_, iSetup);
+  alg_.run(fjInputs_, fjCompoundJets_, fjClusterSeq_);
   
   nSubJet_.run(fjCompoundJets_);
 }
