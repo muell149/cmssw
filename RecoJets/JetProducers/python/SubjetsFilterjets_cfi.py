@@ -25,7 +25,7 @@ CA12JetsCA3FilterjetsPF = cms.EDProducer(
     nSubjettinessNmax	= cms.int32(4),
 	
 )
-CA12JetsCA3FilterjetsPF.jetPtMin		= cms.double(20.)
+CA12JetsCA3FilterjetsPF.jetPtMin		= cms.double(100.)
 CA12JetsCA3FilterjetsPF.doAreaFastjet	= cms.bool(False)
 
 CA12JetsCA3FilterjetsGen = cms.EDProducer(
@@ -44,7 +44,7 @@ CA12JetsCA3FilterjetsGen = cms.EDProducer(
 	nSubjettinessNmin	= cms.int32(1),
 	nSubjettinessNmax	= cms.int32(4)
 )
-CA12JetsCA3FilterjetsGen.jetPtMin		= cms.double(5.)
+CA12JetsCA3FilterjetsGen.jetPtMin		= cms.double(50.)
 CA12JetsCA3FilterjetsGen.doAreaFastjet	= cms.bool(False)
 
 filtjet_pf_seq = cms.Sequence(CA12JetsCA3FilterjetsPF)
