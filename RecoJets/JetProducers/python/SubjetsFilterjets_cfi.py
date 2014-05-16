@@ -12,37 +12,40 @@ CA12JetsCA3FilterjetsPF = cms.EDProducer(
     "SubjetFilterJetProducer",
     PFJetParameters,
     AnomalousCellParameters,
-    jetAlgorithm 			= cms.string("CambridgeAachen"),
-    filterjetAlgorithm	= cms.string("CambridgeAachen"),
-    nFatMax      			= cms.uint32(0),
-    rParam       			= cms.double(1.2),
-    rFilt        			= cms.double(0.3),
-    massDropCut  			= cms.double(0.67),
-    asymmCut     			= cms.double(0.3),
-    asymmCutLater			= cms.bool(True),
+	verbose 			= cms.bool(False),
+	jetAlgorithm 		= cms.string("CambridgeAachen"),
+	rParam       		= cms.double(1.2),
+    nFatMax      		= cms.uint32(0),
+    centralEtaCut		= cms.double(2.5),
+    massDropCut  		= cms.double(0.67),
+	rFilt        		= cms.double(0.3),
+    asymmCut     		= cms.double(0.3),
+    asymmCutLater		= cms.bool(True),
     nSubjettinessNmin	= cms.int32(1),
-    nSubjettinessNmax	= cms.int32(4), 
-    )
-CA12JetsCA3FilterjetsPF.jetPtMin		= cms.double(100.)
-CA12JetsCA3FilterjetsPF.doAreaFastjet= cms.bool(True)
+    nSubjettinessNmax	= cms.int32(4),
+	
+)
+CA12JetsCA3FilterjetsPF.jetPtMin		= cms.double(20.)
+CA12JetsCA3FilterjetsPF.doAreaFastjet	= cms.bool(False)
 
 CA12JetsCA3FilterjetsGen = cms.EDProducer(
     "SubjetFilterJetProducer",
     GenJetParameters,
     AnomalousCellParameters,
-    jetAlgorithm 			= cms.string("CambridgeAachen"),
-	 filterjetAlgorithm 	= cms.string("CambridgeAachen"),
-    nFatMax      			= cms.uint32(0),
-    rParam       			= cms.double(1.2),
-    rFilt        			= cms.double(0.3),
-    massDropCut  			= cms.double(0.67),
-    asymmCut     			= cms.double(0.3),
-    asymmCutLater			= cms.bool(True),
-	 nSubjettinessNmin	= cms.int32(1),
-	 nSubjettinessNmax	= cms.int32(4)
-    )
-CA12JetsCA3FilterjetsGen.jetPtMin		= cms.double(100.)
-CA12JetsCA3FilterjetsGen.doAreaFastjet= cms.bool(True)
+	verbose 			= cms.bool(False),
+    jetAlgorithm 		= cms.string("CambridgeAachen"),
+    rParam       		= cms.double(1.2),
+	nFatMax      		= cms.uint32(0),
+	centralEtaCut		= cms.double(5.0),
+    massDropCut  		= cms.double(0.67),
+	rFilt        		= cms.double(0.3),
+    asymmCut     		= cms.double(0.3),
+    asymmCutLater		= cms.bool(True),
+	nSubjettinessNmin	= cms.int32(1),
+	nSubjettinessNmax	= cms.int32(4)
+)
+CA12JetsCA3FilterjetsGen.jetPtMin		= cms.double(5.)
+CA12JetsCA3FilterjetsGen.doAreaFastjet	= cms.bool(False)
 
 filtjet_pf_seq = cms.Sequence(CA12JetsCA3FilterjetsPF)
 filtjet_gen_seq = cms.Sequence(CA12JetsCA3FilterjetsGen)

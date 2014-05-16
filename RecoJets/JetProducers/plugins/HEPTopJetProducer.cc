@@ -1,20 +1,29 @@
-#include "FWCore/Framework/interface/MakerMacros.h"
-#include "RecoJets/JetProducers/interface/JetSpecific.h"
 #include "HEPTopJetProducer.h"
 
-using namespace std;
-using namespace edm;
-using namespace cms;
-//using namespace reco;
+#include "RecoJets/JetProducers/interface/JetSpecific.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
 
+
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// construction / destruction
+////////////////////////////////////////////////////////////////////////////////
+
+//______________________________________________________________________________
 HEPTopJetProducer::HEPTopJetProducer(edm::ParameterSet const& iConfig):
-		FastjetJetProducer(iConfig),
+		VirtualJetProducer(iConfig),
 		alg_(
-			iConfig.getParameter<double>("MassDropThreshold"),          // mass drop threshold for declustering
-			iConfig.getParameter<double>("MaxSubjetMass"),          		// maximal subjet mass
-			iConfig.getParameter<bool>("UseSubjetMassCuts"),          	// use subjet mass cuts?
-			iConfig.getParameter<double>("jetPtMin"),                  	// min jet pt
-			iConfig.getParameter<double>("centralEtaCut")             	// eta for defining "central" jets
+			iConfig.getParameter<string>	("@module_label"),
+			iConfig.getParameter<bool>		("verbose"),
+			iConfig.getParameter<bool>		("doAreaFastjet"),
+			iConfig.getParameter<unsigned>	("nFatMax"),
+			iConfig.getParameter<double>	("jetPtMin"),             // min jet pt
+			iConfig.getParameter<double>	("centralEtaCut"),        // eta for defining "central" jets
+			iConfig.getParameter<double>	("massDropCut"),          // mass drop threshold for declustering
+			iConfig.getParameter<double>	("subjetMassCut"),        // maximal subjet mass
+			iConfig.getParameter<bool>		("requireTopTag")        // use subjet mass cuts?
 		),
 		nSubJet_(
 			iConfig.getParameter<double>("rParam"),
@@ -35,11 +44,33 @@ HEPTopJetProducer::HEPTopJetProducer(edm::ParameterSet const& iConfig):
 	}
 }
 
-void HEPTopJetProducer::produce(  edm::Event & e, const edm::EventSetup & c ) 
+
+//______________________________________________________________________________
+HEPTopJetProducer::~HEPTopJetProducer()
 {
-  FastjetJetProducer::produce(e, c);
+
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// implementation of member functions
+////////////////////////////////////////////////////////////////////////////////
+
+//______________________________________________________________________________
+void HEPTopJetProducer::produce(  edm::Event & e, const edm::EventSetup & c ) 
+{
+  VirtualJetProducer::produce(e, c);
+}
+
+
+//______________________________________________________________________________
+void HEPTopJetProducer::endJob()
+{
+  cout<<alg_.summary()<<endl;
+}
+
+
+//______________________________________________________________________________
 void HEPTopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   if ( !doAreaFastjet_ && !doRhoFastjet_) {
@@ -50,14 +81,21 @@ void HEPTopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup&
     fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequenceVoronoiArea( fjInputs_, *fjJetDefinition_ , fastjet::VoronoiAreaSpec(voronoiRfact_) ) );
   }
   
-  fjCompoundJets_.clear();
-  
-  alg_.run( fjInputs_, fjCompoundJets_, fjClusterSeq_ );
+  alg_.run(fjInputs_,fjCompoundJets_,topTags_,fjClusterSeq_);
   
   nSubJet_.run(fjCompoundJets_);
 }
 
 
+//______________________________________________________________________________
+void HEPTopJetProducer::inputTowers()
+{
+  fjCompoundJets_.clear();
+  VirtualJetProducer::inputTowers();
+}
+
+
+//______________________________________________________________________________
 void HEPTopJetProducer::output(edm::Event& iEvent,
 				     edm::EventSetup const& iSetup)
 {
@@ -83,6 +121,7 @@ void HEPTopJetProducer::output(edm::Event& iEvent,
 }
 
 
+//______________________________________________________________________________
 template< class T>
 void HEPTopJetProducer::writeCompoundJets(edm::Event& iEvent,
 						const edm::EventSetup& iSetup)
@@ -111,10 +150,7 @@ void HEPTopJetProducer::writeCompoundJets(edm::Event& iEvent,
 		fastjet::PseudoJet fatJet = it->hardJet();
 		p4FatJets.push_back(math::XYZTLorentzVector(fatJet.px(),fatJet.py(),
 		fatJet.pz(),fatJet.e()));
-		areaFatJets.push_back(it->hardJetArea()); 
-		
-		if(it->hardJetArea()>0) topTags->push_back(true);
-		else topTags->push_back(false);
+		areaFatJets.push_back(it->hardJetArea());
 		
 		vector<CompoundPseudoSubJet>::const_iterator itSubBegin(it->subjets().begin());
 		vector<CompoundPseudoSubJet>::const_iterator itSubEnd(it->subjets().end());
@@ -147,11 +183,13 @@ void HEPTopJetProducer::writeCompoundJets(edm::Event& iEvent,
 			subJets->push_back(subJet);
 		}
 	}
-	
-	topTagsAfterPut = iEvent.put(topTags,"toptag");
 
 	subJetsAfterPut = iEvent.put(subJets,"subjets");
-
+	
+	topTags = auto_ptr< vector<bool> >(new vector<bool>(topTags_));
+	
+	topTagsAfterPut = iEvent.put(topTags,"toptag");
+	
 	vector<math::XYZTLorentzVector>::const_iterator itP4Begin(p4FatJets.begin());
 	vector<math::XYZTLorentzVector>::const_iterator itP4End(p4FatJets.end());
 	vector<math::XYZTLorentzVector>::const_iterator itP4(itP4Begin);
