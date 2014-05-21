@@ -7,6 +7,7 @@ _defaultBTagInfos =['impactParameterTagInfos'
                    ,'secondaryVertexTagInfos'
                    #,'secondaryVertexNegativeTagInfos'
                    #,'softMuonTagInfos'
+                   #,'softElectronTagInfos'
                    #,'softPFMuonsTagInfos'
                    #,'softPFElectronsTagInfos'
                    #,'inclusiveSecondaryVertexFinderTagInfos'
@@ -18,6 +19,7 @@ _allowedBTagInfos =['impactParameterTagInfos'
                    ,'softMuonTagInfos'
                    ,'softPFMuonsTagInfos'
                    ,'softPFElectronsTagInfos'
+                   ,'softElectronTagInfos'
                    ,'inclusiveSecondaryVertexFinderTagInfos'
                    ,'inclusiveSecondaryVertexFinderFilteredTagInfos'
                    ]
@@ -39,9 +41,12 @@ _defaultBTagDiscriminators =['jetBProbabilityBJetTags'
                             #,'combinedSecondaryVertexPositiveBJetTags'
                             #,'combinedSecondaryVertexV1BJetTags'
                             #,'combinedSecondaryVertexV1PositiveBJetTags'
-                            #,'combinedSecondaryVertexMVABJetTags'
+                            ,'combinedSecondaryVertexMVABJetTags'
                             #,'combinedSecondaryVertexNegativeBJetTags'
                             #,'combinedSecondaryVertexV1NegativeBJetTags'
+                            #,'softMuonBJetTags'
+                            #,'softPFMuonByPtBJetTags'
+                            #,'softPFMuonByIP3dBJetTags'
                             #,'softPFMuonBJetTags'
                             #,'softPFMuonByPtBJetTags'
                             #,'softPFMuonByIP3dBJetTags'
@@ -770,7 +775,7 @@ class AddJetCollection(ConfigToolBase):
                 ## create jet correctors for MET corrections
                 from JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff import ak5PFL1Fastjet, ak5PFL1Offset, ak5PFL2Relative, ak5PFL3Absolute, ak5PFResidual
                 setattr(process, jetCorrLabel[0]+'L1FastJet'   , ak5PFL1Fastjet.clone ( algorithm=jetCorrLabel[0]
-                                                                                      , srcRho=cms.InputTag(newLabel('kt6PFJets'),'rho') ) )
+                                                                                      , srcRho=cms.InputTag(newLabel('kt6'+jetCollType+'Jets'),'rho') ) )
                 setattr(process, jetCorrLabel[0]+'L1Offset'    , ak5PFL1Offset.clone  ( algorithm=jetCorrLabel[0] ) )
                 setattr(process, jetCorrLabel[0]+'L2Relative'  , ak5PFL2Relative.clone( algorithm=jetCorrLabel[0] ) )
                 setattr(process, jetCorrLabel[0]+'L3Absolute'  , ak5PFL3Absolute.clone( algorithm=jetCorrLabel[0] ) )
@@ -1112,7 +1117,7 @@ class SwitchJetCollection(ConfigToolBase):
                 ## create jet correctors for MET corrections
                 from JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff import ak5PFL1Fastjet, ak5PFL1Offset, ak5PFL2Relative, ak5PFL3Absolute, ak5PFResidual
                 setattr(process, jetCorrLabel[0]+'L1FastJet'   , ak5PFL1Fastjet.clone ( algorithm=jetCorrLabel[0]
-                                                                                      , srcRho=cms.InputTag('kt6PFJets','rho') ) )
+                                                                                      , srcRho=cms.InputTag('kt6'+jetCollType+'Jets','rho') ) )
                 setattr(process, jetCorrLabel[0]+'L1Offset'    , ak5PFL1Offset.clone  ( algorithm=jetCorrLabel[0] ) )
                 setattr(process, jetCorrLabel[0]+'L2Relative'  , ak5PFL2Relative.clone( algorithm=jetCorrLabel[0] ) )
                 setattr(process, jetCorrLabel[0]+'L3Absolute'  , ak5PFL3Absolute.clone( algorithm=jetCorrLabel[0] ) )
@@ -1394,7 +1399,7 @@ class SwitchJetCorrLevels(ConfigToolBase):
                             raise TypeError, "L1FastJet corrections are currently only supported for PF and Calo jets in PAT"
                         ## configure module
                         jetCorrFactorsModule.useRho = True
-                        jetCorrFactorsModule.rho = cms.InputTag('kt6PFJets', 'rho')
+                        jetCorrFactorsModule.rho = cms.InputTag('kt6'+jetType+'Jets', 'rho')
                         ## we set this to True now as a L1 correction type should appear only once
                         ## otherwise levels is miss configured
                         error = True
