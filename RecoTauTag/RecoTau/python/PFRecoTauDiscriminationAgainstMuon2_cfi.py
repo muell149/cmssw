@@ -13,6 +13,7 @@ pfRecoTauDiscriminationAgainstMuon2 = cms.EDProducer("PFRecoTauDiscriminationAga
     Prediscriminants = requireLeadTrack,
 
     # algorithm parameters
+
     discriminatorOption = cms.string('loose'), # available options are: 'loose', 'medium', 'tight' and 'custom'
     HoPMin = cms.double(0.2),
     maxNumberOfMatches = cms.int32(0), # negative value would turn off this cut in case of 'custom' discriminator 

@@ -282,7 +282,7 @@ from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets as _dummy
 kt6PFJetsForRhoComputationVoronoi = _dummy.clone(
     doRhoFastjet = True,
     voronoiRfact = 0.9
-)
+    )
 
 hpsPFTauDiscriminationByMVAIsolationSeq = cms.Sequence(
     kt6PFJetsForRhoComputationVoronoi*
@@ -364,7 +364,6 @@ hpsPFTauDiscriminationByTightMuonRejection3 = hpsPFTauDiscriminationByLooseMuonR
             Prediscriminants = noPrediscriminants,
             maxNumberOfHitsLast2Stations = cms.int32(0)
                     )
-
 
 hpsPFTauDiscriminationByMVAElectronRejection = pfRecoTauDiscriminationAgainstElectronMVA.clone(
     PFTauProducer = cms.InputTag('hpsPFTauProducer'),
@@ -731,5 +730,4 @@ produceAndDiscriminateHPSPFTaus = cms.Sequence(
     hpsPFTauDiscriminationByTightMuonRejection2*
     hpsPFTauDiscriminationByLooseMuonRejection3*
     hpsPFTauDiscriminationByTightMuonRejection3
-    
 )

@@ -30,6 +30,7 @@ namespace reco {
 	  vector<float> all;
 	  all.reserve(33);
     
+
 	  for(unsigned int i = 0; i < niso.size(); i++)
 	    all.push_back(niso[i]);
 
@@ -110,46 +111,46 @@ reco::tau::cone::IsoRings PFRecoTauDiscriminationByMVAIsolation::computeIsoRings
   vector<float>          isoptsum(3);
 
   for(unsigned int i = 0; i < pfTau->isolationPFCands().size(); i++)
-  {
-    const PFCandidateRef pf = pfTau->isolationPFCands().at(i);
+    {
+      const PFCandidateRef pf = pfTau->isolationPFCands().at(i);
+      
+      // Angular distance between PF candidate and tau
+      float deta = pfTau->eta() - pf->eta();
+      float dphi = reco::deltaPhi(pfTau->phi(), pf->phi());
+      float dr = reco::deltaR(pfTau->eta(), pfTau->phi(), pf->eta(), pf->phi());
+      int pftype = 0;
 
-    // Angular distance between PF candidate and tau
-    float deta = pfTau->eta() - pf->eta();
-    float dphi = reco::deltaPhi(pfTau->phi(), pf->phi());
-    float dr = reco::deltaR(pfTau->eta(), pfTau->phi(), pf->eta(), pf->phi());
-    int pftype = 0;
-
-    // Determine PF candidate type
-    if(pf->charge() != 0)                           pftype = 0;
-    else if(pf->particleId() == PFCandidate::gamma) pftype = 1;
-    else                                            pftype = 2;
-
-    // Number of isolation candidates by type
-    niso[pftype]++;
-
-    // Isolation Rings
-    if(dr < 0.1)      rings[pftype][0] += pf->pt();
-    else if(dr < 0.2) rings[pftype][1] += pf->pt();
-    else if(dr < 0.3) rings[pftype][2] += pf->pt();
-    else if(dr < 0.4) rings[pftype][3] += pf->pt();
-    else if(dr < 0.5) rings[pftype][4] += pf->pt();
-
-    // Angle Shape Variables
-    shapes[pftype][0] += pf->pt() * deta;
-    shapes[pftype][1] += pf->pt() * dphi;
-    shapes[pftype][2] += pf->pt() * deta*deta;
-    shapes[pftype][3] += pf->pt() * dphi*dphi;
-    shapes[pftype][4] += pf->pt() * deta*dphi;
-    isoptsum[pftype]  += pf->pt();
-  }
+      // Determine PF candidate type
+      if(pf->charge() != 0)                           pftype = 0;
+      else if(pf->particleId() == PFCandidate::gamma) pftype = 1;
+      else                                            pftype = 2;
+      
+      // Number of isolation candidates by type
+      niso[pftype]++;
+      
+      // Isolation Rings
+      if(dr < 0.1)      rings[pftype][0] += pf->pt();
+      else if(dr < 0.2) rings[pftype][1] += pf->pt();
+      else if(dr < 0.3) rings[pftype][2] += pf->pt();
+      else if(dr < 0.4) rings[pftype][3] += pf->pt();
+      else if(dr < 0.5) rings[pftype][4] += pf->pt();
+      
+      // Angle Shape Variables
+      shapes[pftype][0] += pf->pt() * deta;
+      shapes[pftype][1] += pf->pt() * dphi;
+      shapes[pftype][2] += pf->pt() * deta*deta;
+      shapes[pftype][3] += pf->pt() * dphi*dphi;
+      shapes[pftype][4] += pf->pt() * deta*dphi;
+      isoptsum[pftype]  += pf->pt();
+    }
 
   // Mean and variance of angle variables are weighted by pT
   for(unsigned int i = 0; i < shapes.size(); i++)
   {
     for(unsigned int j = 0; j < shapes[i].size(); j++)
-    {
-      shapes[i][j] = isoptsum[i] > 0 ? fabs(shapes[i][j]/isoptsum[i]) : 0;
-    }
+      {
+	shapes[i][j] = isoptsum[i] > 0 ? fabs(shapes[i][j]/isoptsum[i]) : 0;
+      }
   }
 
   // Fill IsoRing object

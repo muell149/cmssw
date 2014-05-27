@@ -8,7 +8,6 @@
  * \version $Revision: 1.10 $
  *
  * $Id: PFRecoTauDiscriminationAgainstMuon2.cc,v 1.10 2013/04/08 11:45:27 jez Exp $
- *
  */
 
 #include "RecoTauTag/RecoTau/interface/TauDiscriminationProducerBase.h"
@@ -17,6 +16,7 @@
 
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
+
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "DataFormats/TrackReco/interface/HitPattern.h"
@@ -123,7 +123,6 @@ double PFRecoTauDiscriminationAgainstMuon2::discriminate(const reco::PFTauRef& p
   }
 
   int numMatches = 0;
-
   std::vector<int> numHitsDT(4);
   std::vector<int> numHitsCSC(4);
   std::vector<int> numHitsRPC(4);
@@ -132,6 +131,7 @@ double PFRecoTauDiscriminationAgainstMuon2::discriminate(const reco::PFTauRef& p
     numHitsCSC[iStation] = 0;
     numHitsRPC[iStation] = 0;
   }
+
 
   const reco::PFCandidateRef& pfLeadChargedHadron = pfTau->leadPFChargedHadrCand();
   if ( pfLeadChargedHadron.isNonnull() ) {
@@ -167,14 +167,13 @@ double PFRecoTauDiscriminationAgainstMuon2::discriminate(const reco::PFTauRef& p
     std::cout << "numHitsCSC = " << format_vint(numHitsCSC) << std::endl;
     std::cout << "numHitsRPC = " << format_vint(numHitsRPC) << std::endl;
   }
-  
+
   int numLast2StationsWithHits = 0;
   for ( int iStation = 2; iStation < 4; ++iStation ) {
     if ( numHitsDT[iStation]  > 0 ) ++numLast2StationsWithHits;
     if ( numHitsCSC[iStation] > 0 ) ++numLast2StationsWithHits;
     if ( numHitsRPC[iStation] > 0 ) ++numLast2StationsWithHits;
   }
-
 
   bool passesCaloMuonVeto = true;
   if ( pfLeadChargedHadron.isNonnull() ) {
