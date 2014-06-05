@@ -91,6 +91,7 @@ void HEPTopJetProducer::runAlgorithm( edm::Event& iEvent, const edm::EventSetup&
 void HEPTopJetProducer::inputTowers()
 {
   fjCompoundJets_.clear();
+  topTags_.clear();
   VirtualJetProducer::inputTowers();
 }
 
@@ -142,7 +143,7 @@ void HEPTopJetProducer::writeCompoundJets(edm::Event& iEvent,
 	vector<CompoundPseudoJet>::const_iterator itBegin(fjCompoundJets_.begin());
 	vector<CompoundPseudoJet>::const_iterator itEnd(fjCompoundJets_.end());
 	vector<CompoundPseudoJet>::const_iterator it(itBegin);
-  
+	
 	for (;it!=itEnd;++it) {
 
 		int jetIndex = it-itBegin;
