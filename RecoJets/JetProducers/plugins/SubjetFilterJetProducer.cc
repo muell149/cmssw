@@ -40,29 +40,51 @@ using namespace std;
 
 //______________________________________________________________________________
 SubjetFilterJetProducer::SubjetFilterJetProducer(const edm::ParameterSet& iConfig)
-  : VirtualJetProducer(iConfig)
-  , alg_(iConfig.getParameter<string>	("@module_label"),
-  		 iConfig.getParameter<bool> 	("verbose"),
-		 iConfig.getParameter<bool>     ("doAreaFastjet"),
-		 iConfig.getParameter<double>   ("rParam"),
-		 iConfig.getParameter<unsigned> ("nFatMax"),
-		 iConfig.getParameter<double>   ("jetPtMin"),
-		 iConfig.getParameter<double>   ("centralEtaCut"),
-		 iConfig.getParameter<double>   ("massDropCut"),
-		 iConfig.getParameter<double>   ("rFilt"),
-		 iConfig.getParameter<double>   ("asymmCut"),
-		 iConfig.getParameter<bool>     ("asymmCutLater")
+  : VirtualJetProducer(iConfig),
+    alg_(iConfig.getParameter<string>	("@module_label"),
+	 iConfig.getParameter<bool> 	("verbose"),
+	 iConfig.getParameter<bool>     ("doAreaFastjet"),
+	 iConfig.getParameter<double>   ("rParam"),
+	 iConfig.getParameter<unsigned> ("nFatMax"),
+	 iConfig.getParameter<double>   ("jetPtMin"),
+	 iConfig.getParameter<double>   ("centralEtaCut"),
+	 iConfig.getParameter<double>   ("massDropCut"),
+	 iConfig.getParameter<double>   ("rFilt"),
+	 iConfig.getParameter<double>   ("asymmCut"),
+	 iConfig.getParameter<bool>     ("asymmCutLater")
 	 ),
-	 nSubJet_(iConfig.getParameter<double>("rParam"),
-			iConfig.getParameter<int>("nSubjettinessNmin"),
-			iConfig.getParameter<int>("nSubjettinessNmax")
-	 )
+    nSubJetAlgo1_(
+		  1, // N
+		  fastjet::Njettiness::AxesMode::kt_axes,
+		  1., //beta
+		  iConfig.getParameter<double>	("rParam") // cone size R0
+		  ),
+  nSubJetAlgo2_(
+		2, // N
+		fastjet::Njettiness::AxesMode::kt_axes,
+		1., //beta
+		iConfig.getParameter<double>	("rParam") // cone size R0
+		),
+  
+  nSubJetAlgo3_(
+		3, // N
+		fastjet::Njettiness::AxesMode::kt_axes,
+		1., //beta
+		iConfig.getParameter<double>	("rParam") // cone size R0
+		),
+  
+  nSubJetAlgo4_(
+		4, // N
+		fastjet::Njettiness::AxesMode::kt_axes,
+		1., //beta
+		iConfig.getParameter<double>	("rParam") // cone size R0
+		)
 {
 	produces<reco::BasicJetCollection>("fatjet");
 	makeProduces(moduleLabel_,"subjets");
 	makeProduces(moduleLabel_,"filterjets");
 
-	for(size_t N=nSubJet_.getNmin();N<=nSubJet_.getNmax();N++){
+	for(size_t N=1;N<=4;N++){
 		char tau_char[50];
 		sprintf (tau_char, "tau%i", (int) N);
 		std::string tau_string = tau_char;
@@ -111,8 +133,18 @@ void SubjetFilterJetProducer::runAlgorithm(edm::Event& iEvent,
   }
   
   alg_.run(fjInputs_, fjCompoundJets_, fjClusterSeq_);
-  
-  nSubJet_.run(fjCompoundJets_);
+  for(uint i=0; i<fjCompoundJets_.size();i++){
+    // run nsubjettiness algorithms on fat jet
+    double n1= nSubJetAlgo1_(fjCompoundJets_[i].hardJet());
+    double n2= nSubJetAlgo2_(fjCompoundJets_[i].hardJet());
+    double n3= nSubJetAlgo3_(fjCompoundJets_[i].hardJet());
+    double n4= nSubJetAlgo4_(fjCompoundJets_[i].hardJet());
+    nSjn1_.push_back(n1);
+    nSjn2_.push_back(n2);
+    nSjn3_.push_back(n3);
+    nSjn4_.push_back(n4);
+  }
+
 }
 
 
@@ -120,6 +152,10 @@ void SubjetFilterJetProducer::runAlgorithm(edm::Event& iEvent,
 void SubjetFilterJetProducer::inputTowers()
 {
   fjCompoundJets_.clear();
+  nSjn1_.clear();
+  nSjn2_.clear();
+  nSjn3_.clear();
+  nSjn4_.clear();
   VirtualJetProducer::inputTowers();
 }
 
@@ -251,17 +287,19 @@ void SubjetFilterJetProducer::writeCompoundJets(edm::Event& iEvent,
   }
   
   iEvent.put(fatJets,"fatjet");
-  
-	for(size_t N=nSubJet_.getNmin();N<=nSubJet_.getNmax();N++){
-		auto_ptr< vector<double> > NSubjettiness(new vector<double>());
-		*NSubjettiness = nSubJet_.getNSubjettiness(N);
-		
-		char tau_char[50];
-		sprintf (tau_char, "tau%i", (int) N);
-		std::string tau_string = tau_char;
-		
-		iEvent.put(NSubjettiness, tau_string);
-	}
+  for(size_t N=1;N<=4;N++){
+    auto_ptr< vector<double> > NSubjettiness(new vector<double>());
+    if(N==1)*NSubjettiness = nSjn1_;
+    if(N==2)*NSubjettiness = nSjn2_;
+    if(N==3)*NSubjettiness = nSjn3_;
+    if(N==4)*NSubjettiness = nSjn4_;
+    
+    char tau_char[50];
+    sprintf (tau_char, "tau%i", (int) N);
+    std::string tau_string = tau_char;
+    
+    iEvent.put(NSubjettiness, tau_string);
+  }
 }
 
 

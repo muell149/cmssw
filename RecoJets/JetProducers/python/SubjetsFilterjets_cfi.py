@@ -21,8 +21,6 @@ CA12JetsCA3FilterjetsPF = cms.EDProducer(
 	rFilt        		= cms.double(0.3),
     asymmCut     		= cms.double(0.3),
     asymmCutLater		= cms.bool(True),
-    nSubjettinessNmin	= cms.int32(1),
-    nSubjettinessNmax	= cms.int32(4),
 	
 )
 CA12JetsCA3FilterjetsPF.jetPtMin		= cms.double(100.)
@@ -41,8 +39,6 @@ CA12JetsCA3FilterjetsGen = cms.EDProducer(
 	rFilt        		= cms.double(0.3),
     asymmCut     		= cms.double(0.3),
     asymmCutLater		= cms.bool(True),
-	nSubjettinessNmin	= cms.int32(1),
-	nSubjettinessNmax	= cms.int32(4)
 )
 CA12JetsCA3FilterjetsGen.jetPtMin		= cms.double(50.)
 CA12JetsCA3FilterjetsGen.doAreaFastjet	= cms.bool(False)
