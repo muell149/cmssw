@@ -55,7 +55,7 @@ class HEPTopTaggerAlgorithm
 	public:
 		void run(const std::vector<fastjet::PseudoJet> & fjInputs, 
 		std::vector<CompoundPseudoJet> & fjJets,
-		std::vector<bool> topTags,
+		std::vector<bool> & topTags,
 		boost::shared_ptr<fastjet::ClusterSequence> & fjClusterSeq);
 
 		std::string summary() const;
