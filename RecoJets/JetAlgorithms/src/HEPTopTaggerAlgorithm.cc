@@ -88,7 +88,7 @@ namespace{
 //______________________________________________________________________________
 void HEPTopTaggerAlgorithm::run(const std::vector<fastjet::PseudoJet>& fjInputs, 
 								std::vector<CompoundPseudoJet>& fjJets,
-								std::vector<bool> topTags,
+								std::vector<bool>& topTags,
 								boost::shared_ptr<fastjet::ClusterSequence> & fjClusterSeq)
 {
 	nevents_++;
@@ -158,8 +158,6 @@ void HEPTopTaggerAlgorithm::run(const std::vector<fastjet::PseudoJet>& fjInputs,
 			fastjet::PseudoJet W = join(subjets[1], subjets[2], *rec);
 
 			fastjet::PseudoJet result = fastjet::join( W1, W2, non_W, *rec);
-			
-			//if (use_subjet_mass_cuts_ && (! _top_selector.pass(result) || ! _W_selector.pass(W))) continue;
 			
 			vector<fastjet::PseudoJet> TopJetConstituents;
 
