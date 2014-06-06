@@ -1,17 +1,12 @@
 #ifndef RECOJETS_JETPRODUCERS_HEPTOPJETPRODUCER_H
 #define RECOJETS_JETPRODUCERS_HEPTOPJETPRODUCER_H 1
 
-
-
-
-
-
-
 #include "VirtualJetProducer.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "RecoJets/JetAlgorithms/interface/CompoundPseudoJet.h"
 #include "RecoJets/JetAlgorithms/interface/HEPTopTaggerAlgorithm.h"
-#include "RecoJets/JetAlgorithms/interface/NSubjettinessAlgorithm.h"
+#include "RecoJets/JetAlgorithms/interface/Nsubjettiness.h"
+
 
 class HEPTopJetProducer : public VirtualJetProducer
 {
@@ -39,10 +34,18 @@ class HEPTopJetProducer : public VirtualJetProducer
 	// member data
 	//
 	private:
-		HEPTopTaggerAlgorithm				alg_;         		/// The algorithm to do the work
-		NSubjettinessAlgorithm				nSubJet_;
-		std::vector<CompoundPseudoJet>  	fjCompoundJets_;
-		std::vector<bool>					topTags_;
+		HEPTopTaggerAlgorithm alg_;         		/// The algorithm to do the work
+		fastjet::Nsubjettiness nSubJetAlgo1_;
+		fastjet::Nsubjettiness nSubJetAlgo2_;
+		fastjet::Nsubjettiness nSubJetAlgo3_;
+		fastjet::Nsubjettiness nSubJetAlgo4_;
+		std::vector<double> nSjn1_;
+		std::vector<double> nSjn2_;
+		std::vector<double> nSjn3_;
+		std::vector<double> nSjn4_;
+
+		std::vector<CompoundPseudoJet> fjCompoundJets_;
+		std::vector<bool> topTags_;
 };
 
 
