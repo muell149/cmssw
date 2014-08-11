@@ -51,7 +51,8 @@ SubjetFilterJetProducer::SubjetFilterJetProducer(const edm::ParameterSet& iConfi
 	 iConfig.getParameter<double>   ("massDropCut"),
 	 iConfig.getParameter<double>   ("rFilt"),
 	 iConfig.getParameter<double>   ("asymmCut"),
-	 iConfig.getParameter<bool>     ("asymmCutLater")
+	 iConfig.getParameter<bool>     ("asymmCutLater"),
+	 iConfig.getParameter<double>   ("filterJetPtMin")
 	 ),
     nSubJetAlgo1_(
 		  1, // N
