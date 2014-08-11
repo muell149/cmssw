@@ -33,16 +33,17 @@ class SubjetFilterAlgorithm
 	//
 	public:
 		SubjetFilterAlgorithm(const std::string& moduleLabel = '\0',
-							bool verbose = false,
-							bool doAreaFastjet = false,
-							double rParam = 1.2,
-							unsigned nFatMax = 0,
-							double jetPtMin = 10.,
-							double centralEtaCut = 2.5,
-							double massDropCut = 0.67,
-							double rFilt = 0.3,
-							double asymmCut = 0.3,
-							bool asymmCutLater = true);
+				      bool verbose = false,
+				      bool doAreaFastjet = false,
+				      double rParam = 1.2,
+				      unsigned nFatMax = 0,
+				      double jetPtMin = 10.,
+				      double centralEtaCut = 2.5,
+				      double massDropCut = 0.67,
+				      double rFilt = 0.3,
+				      double asymmCut = 0.3,
+				      bool asymmCutLater = true,
+				      double filterJetPtMin = 10.);
 							
 		virtual ~SubjetFilterAlgorithm();
 
@@ -73,6 +74,7 @@ class SubjetFilterAlgorithm
 		double						rFilt_;
 		double                   	asymmCut2_;
 		bool                     	asymmCutLater_;
+		double                   	filterJetPtMin_;
 
 		unsigned                 	nevents_;
 		unsigned                 	ntotal_;

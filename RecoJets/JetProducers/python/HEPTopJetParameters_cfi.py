@@ -15,12 +15,12 @@ HEPTopJetsPF = cms.EDProducer(
     jetAlgorithm 	= cms.string("CambridgeAachen"),
     rParam       	= cms.double(1.5),
     nFatMax      	= cms.uint32(0),
-    centralEtaCut	= cms.double(2.5),
+    centralEtaCut	= cms.double(2.0),
     massDropCut		= cms.double(0.8),
     subjetMassCut 	= cms.double(30.),
     requireTopTag	= cms.bool(False)
 )
-HEPTopJetsPF.jetPtMin		= cms.double(100.)
+HEPTopJetsPF.jetPtMin		= cms.double(180.)
 HEPTopJetsPF.doAreaFastjet  = cms.bool(True)
 
 HEPTopJetsGen = cms.EDProducer(
@@ -31,12 +31,12 @@ HEPTopJetsGen = cms.EDProducer(
     jetAlgorithm 	= cms.string("CambridgeAachen"),
     rParam       	= cms.double(1.5),
     nFatMax      	= cms.uint32(0),
-    centralEtaCut	= cms.double(5.0),
+    centralEtaCut	= cms.double(2.1),
     massDropCut		= cms.double(0.8),
     subjetMassCut 	= cms.double(30.),
     requireTopTag	= cms.bool(False)
 )
-HEPTopJetsGen.jetPtMin		= cms.double(50.)
+HEPTopJetsGen.jetPtMin		= cms.double(150.)
 HEPTopJetsGen.doAreaFastjet	= cms.bool(True)
 
 heptopjet_pf_seq = cms.Sequence(HEPTopJetsPF)

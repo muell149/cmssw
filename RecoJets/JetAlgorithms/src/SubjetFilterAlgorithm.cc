@@ -35,16 +35,17 @@ using namespace std;
 
 //______________________________________________________________________________
 SubjetFilterAlgorithm::SubjetFilterAlgorithm(const std::string& moduleLabel,
-											bool verbose,
-											bool doAreaFastjet,
-											double rParam,
-											unsigned nFatMax,
-											double jetPtMin,
-											double centralEtaCut,
-											double massDropCut,
-											double rFilt,
-											double asymmCut,
-											bool asymmCutLater)
+					     bool verbose,
+					     bool doAreaFastjet,
+					     double rParam,
+					     unsigned nFatMax,
+					     double jetPtMin,
+					     double centralEtaCut,
+					     double massDropCut,
+					     double rFilt,
+					     double asymmCut,
+					     bool asymmCutLater,
+					     double filterJetPtMin)
   : moduleLabel_(moduleLabel),
     verbose_(verbose),
 	doAreaFastjet_(doAreaFastjet),
@@ -56,6 +57,7 @@ SubjetFilterAlgorithm::SubjetFilterAlgorithm(const std::string& moduleLabel,
 	rFilt_(rFilt),
 	asymmCut2_(asymmCut*asymmCut),
 	asymmCutLater_(asymmCutLater),
+	filterJetPtMin_(filterJetPtMin),
 	nevents_(0),
 	ntotal_(0),
 	nfound_(0)
@@ -159,11 +161,16 @@ void SubjetFilterAlgorithm::run(const std::vector<fastjet::PseudoJet>& fjInputs,
 				if (verbose_) cout<<"PASSED y cut"<<endl;
 
 				vector<fastjet::PseudoJet> fjFilterJets;
+				vector<fastjet::PseudoJet> fjFilterJets_nocut;
 				double       Rbb   = std::sqrt(fjSubJet1.squared_distance(fjSubJet2));
 				double       Rfilt = std::min(0.5*Rbb,rFilt_);
 				double       dcut  = Rfilt*Rfilt/rParam_/rParam_;
 				
-				fjFilterJets=fastjet::sorted_by_pt(cs->exclusive_subjets(fjCurrentJet,dcut));
+				fjFilterJets_nocut=fastjet::sorted_by_pt(cs->exclusive_subjets(fjCurrentJet,dcut));
+				for(size_t iFilter=0;iFilter<fjFilterJets_nocut.size();iFilter++){
+				  if(fjFilterJets_nocut[iFilter].pt()>filterJetPtMin_) fjFilterJets.push_back(fjFilterJets_nocut[iFilter]);
+				  else break;
+				}
 				
 				if (verbose_) {
 					cout<<"Rbb="<<Rbb<<", Rfilt="<<Rfilt<<endl;
