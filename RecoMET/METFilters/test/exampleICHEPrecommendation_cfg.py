@@ -27,15 +27,16 @@ process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
 
 ## The HCAL laser filter _____________________________________________________||
 process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
+process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
+process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
 
 ## The ECAL dead cell trigger primitive filter _______________________________||
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
+## For AOD and RECO recommendation to use recovered rechits
+process.EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag("ecalTPSkimNA")
 
 ## The EE bad SuperCrystal filter ____________________________________________||
 process.load('RecoMET.METFilters.eeBadScFilter_cfi')
-
-## The ECAL laser correction filter
-process.load('RecoMET.METFilters.ecalLaserCorrFilter_cfi')
 
 ## The Good vertices collection needed by the tracking failure filter ________||
 process.goodVertices = cms.EDFilter(
@@ -48,19 +49,6 @@ process.goodVertices = cms.EDFilter(
 ## The tracking failure filter _______________________________________________||
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 
-## The tracking POG filters __________________________________________________||
-process.load('RecoMET.METFilters.trackingPOGFilters_cff')
-## NOTE: to make tagging mode of the tracking POG filters (three of them), please do:
-##    process.manystripclus53X.taggedMode = cms.untracked.bool(True)
-##    process.manystripclus53X.forcedValue = cms.untracked.bool(False)
-##    process.toomanystripclus53X.taggedMode = cms.untracked.bool(True)
-##    process.toomanystripclus53X.forcedValue = cms.untracked.bool(False)
-##    process.logErrorTooManyClusters.taggedMode = cms.untracked.bool(True)
-##    process.logErrorTooManyClusters.forcedValue = cms.untracked.bool(False)
-## Also the stored boolean for the three filters is opposite to what we usually
-## have for other filters, i.e., true means rejected bad events while false means 
-## good events.
-
 process.filtersSeq = cms.Sequence(
    process.primaryVertexFilter *
    process.noscraping *
@@ -69,7 +57,5 @@ process.filtersSeq = cms.Sequence(
    process.hcalLaserEventFilter *
    process.EcalDeadCellTriggerPrimitiveFilter *
    process.goodVertices * process.trackingFailureFilter *
-   process.eeBadScFilter *
-   process.ecalLaserCorrFilter *
-   process.trkPOGFilters
+   process.eeBadScFilter
 )
