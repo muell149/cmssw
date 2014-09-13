@@ -13,7 +13,7 @@
 //
 // Original Author:  Tommaso Boccali
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: TestPerformanceFW_ES.cc,v 1.7 2013/01/31 17:54:44 msegala Exp $
+// $Id: TestPerformanceFW_ES.cc,v 1.6 2012/06/20 13:13:49 msegala Exp $
 //
 //
 
@@ -129,7 +129,7 @@ TestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 //Setup the point we wish to test!
       BinningPointByMap measurePoint;
       measurePoint.insert(BinningVariables::JetEt,50);
-      measurePoint.insert(BinningVariables::JetAbsEta,0.6);
+      measurePoint.insert(BinningVariables::JetEta,0.6);
 
       std::cout << "Is it OK? " << perf.isResultOk( measureMap[ measureType[ iMeasure] ], measurePoint)
 		<< " result at 50 GeV, 0,6 |eta| " << perf.getResult( measureMap[ measureType[ iMeasure] ], measurePoint)
@@ -137,8 +137,8 @@ TestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
       std::cout << "Error checking!" << std::endl;
       measurePoint.reset();
-      measurePoint.insert(BinningVariables::JetEt,0);
-      measurePoint.insert(BinningVariables::JetAbsEta,10);
+      measurePoint.insert(BinningVariables::JetEt,300);
+      measurePoint.insert(BinningVariables::JetEta,10);
 
       std::cout << "Is it OK? " << perf.isResultOk( measureMap[ measureType[ iMeasure] ], measurePoint)
 		<< " result at 0 GeV, 10 |eta| " << perf.getResult( measureMap[ measureType[ iMeasure] ], measurePoint)
