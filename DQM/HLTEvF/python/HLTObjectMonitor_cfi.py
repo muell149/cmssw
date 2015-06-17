@@ -36,7 +36,7 @@ bJet_moduleNamePF = "hltCSVPF0p78"
 #To avoid booking histogram, set pathName = cms.string("")
 
 hltObjectMonitor = cms.EDAnalyzer('HLTObjectMonitor',
-    processName = cms.string("HLT"),
+    processName = cms.string("TEST"),
     alphaT = cms.PSet(
         pathName = cms.string("HLT_PFHT200_DiPFJetAve90_PFAlphaT0p63"),
         moduleName = cms.string("hltPFHT200PFAlphaT0p63"),
