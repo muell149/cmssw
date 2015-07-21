@@ -69,7 +69,8 @@ onlineOfflineFileName(const std::string &fileBaseName,
   while ((pos = wflow.find('/', pos)) != std::string::npos)
     wflow.replace(pos++, 1, "__");
 
-  std::string filename = fileBaseName + suffix + wflow + child + dataFileExtension(fileFormat);
+  //  std::string filename = fileBaseName + suffix + wflow + child + dataFileExtension(fileFormat);
+  std::string filename = "DQM_forHLT" + dataFileExtension(fileFormat);
   return filename;
 }
 
@@ -171,8 +172,10 @@ doSaveForOnline(DQMStore *store,
 {
   // TODO(rovere): fix the online case. so far we simply rely on the
   // fact that we assume we will not run multithreaded in online.
+  const std::string &new_filename = "DQM_forHLT.root";
+
   if (fileFormat == DQMFileSaver::ROOT)
-    store->save(filename,
+    store->save(new_filename,
                 directory,
                 rxpat,
                 rewrite,
